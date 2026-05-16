@@ -1,0 +1,52 @@
+enunciado/*
+
+# Arquivo interno de divisão de tarefas (não commitar)
+team_files.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtualenv
+.venv/
+venv/
+.unnamed_venv/
+env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+
+# Env vars
+.env
+.env.*
+!.env.example
+
+# Node / Svelte
+node_modules/
+.svelte-kit/
+frontend/build/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Docker
+.docker/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
