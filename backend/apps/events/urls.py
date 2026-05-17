@@ -1,4 +1,10 @@
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import EventViewSet
 
-# TODO: Membro 2 — registrar rotas após implementar as views
-urlpatterns = []
+router = DefaultRouter()
+router.register("", EventViewSet, basename="event")
+
+urlpatterns = [
+    path("", include(router.urls)),
+]
