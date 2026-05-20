@@ -1,4 +1,10 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import AnnouncementViewSet
 
-# TODO: Membro 3 — registrar rotas após implementar as views
-urlpatterns = []
+router = DefaultRouter()
+router.register("", AnnouncementViewSet, basename="announcement")
+
+urlpatterns = [
+    path("", include(router.urls)),
+]
