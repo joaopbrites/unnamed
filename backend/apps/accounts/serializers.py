@@ -22,6 +22,13 @@ class UserPublicSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "first_name", "last_name", "bio", "is_member", "is_staff")
+        read_only_fields = fields
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     recent_registrations = serializers.SerializerMethodField()
     recent_comments = serializers.SerializerMethodField()

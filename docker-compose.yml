@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sdsc_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sdsc_user} -d ${POSTGRES_DB:-sdsc_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -38,7 +38,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - PUBLIC_API_URL=http://localhost:8000/api
+      - VITE_API_URL=http://localhost:8000/api
     depends_on:
       - backend
     profiles:
