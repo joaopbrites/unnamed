@@ -23,7 +23,6 @@ class EventViewSetTest(APITestCase):
             created_by=self.admin,
         )
 
-    # --- Leitura pública ---
     def test_list_events_is_public(self):
         response = self.client.get("/api/events/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -36,6 +35,10 @@ class EventViewSetTest(APITestCase):
     def test_response_contains_registration_count(self):
         response = self.client.get(f"/api/events/{self.event.pk}/")
         self.assertIn("registrations_count", response.data)
+
+    def test_response_contains_capacity(self):
+        response = self.client.get(f"/api/events/{self.event.pk}/")
+        self.assertIn("capacity", response.data)
 
     # --- Criação: apenas admin ---
     def test_create_event_unauthenticated_returns_401(self):
@@ -71,7 +74,7 @@ class EventViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], "Novo Evento Admin")
 
-    # --- Inscrição ---
+    # --- Inscrição sem capacidade ---
     def test_register_unauthenticated_returns_401(self):
         response = self.client.post(f"/api/events/{self.event.pk}/register/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -83,6 +86,11 @@ class EventViewSetTest(APITestCase):
         self.assertTrue(
             EventRegistration.objects.filter(user=self.member, event=self.event).exists()
         )
+
+    def test_register_sets_confirmed_when_no_capacity_limit(self):
+        self.client.force_authenticate(user=self.member)
+        response = self.client.post(f"/api/events/{self.event.pk}/register/")
+        self.assertEqual(response.data["status"], "confirmed")
 
     def test_register_twice_returns_400(self):
         EventRegistration.objects.create(user=self.member, event=self.event)
@@ -97,4 +105,63 @@ class EventViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(
             EventRegistration.objects.filter(user=self.member, event=self.event).exists()
+        )
+
+
+class EventCapacityTest(APITestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser(
+            username="admin", email="admin@test.com", password="admin123"
+        )
+        self.member1 = User.objects.create_user(username="m1", password="senha123")
+        self.member2 = User.objects.create_user(username="m2", password="senha123")
+        self.member3 = User.objects.create_user(username="m3", password="senha123")
+        self.event = Event.objects.create(
+            title="Evento Limitado",
+            description="desc",
+            date=timezone.now() + timezone.timedelta(days=5),
+            location="Local",
+            capacity=2,
+            created_by=self.admin,
+        )
+
+    def test_register_confirmed_when_capacity_available(self):
+        self.client.force_authenticate(user=self.member1)
+        response = self.client.post(f"/api/events/{self.event.pk}/register/")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["status"], "confirmed")
+
+    def test_register_waitlisted_when_capacity_full(self):
+        EventRegistration.objects.create(user=self.member1, event=self.event, status="confirmed")
+        EventRegistration.objects.create(user=self.member2, event=self.event, status="confirmed")
+        self.client.force_authenticate(user=self.member3)
+        response = self.client.post(f"/api/events/{self.event.pk}/register/")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["status"], "waitlisted")
+
+    def test_unregister_confirmed_promotes_waitlisted(self):
+        reg1 = EventRegistration.objects.create(user=self.member1, event=self.event, status="confirmed")
+        EventRegistration.objects.create(user=self.member2, event=self.event, status="confirmed")
+        reg3 = EventRegistration.objects.create(user=self.member3, event=self.event, status="waitlisted")
+
+        self.client.force_authenticate(user=self.member1)
+        self.client.delete(f"/api/events/{self.event.pk}/unregister/")
+
+        reg3.refresh_from_db()
+        self.assertEqual(reg3.status, "confirmed")
+
+    def test_unregister_waitlisted_does_not_promote(self):
+        EventRegistration.objects.create(user=self.member1, event=self.event, status="confirmed")
+        EventRegistration.objects.create(user=self.member2, event=self.event, status="confirmed")
+        reg3 = EventRegistration.objects.create(user=self.member3, event=self.event, status="waitlisted")
+
+        self.client.force_authenticate(user=self.member3)
+        self.client.delete(f"/api/events/{self.event.pk}/unregister/")
+
+        self.assertFalse(
+            EventRegistration.objects.filter(user=self.member3, event=self.event).exists()
+        )
+        # Os confirmados continuam confirmados
+        self.assertEqual(
+            EventRegistration.objects.filter(event=self.event, status="confirmed").count(), 2
         )

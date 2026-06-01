@@ -6,6 +6,7 @@ class EventRegistrationInline(admin.TabularInline):
     model = EventRegistration
     extra = 0
     readonly_fields = ("registered_at",)
+    fields = ("user", "status", "registered_at")
 
 
 @admin.register(Event)
@@ -19,14 +20,14 @@ class EventAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("title", "description", "image")}),
         ("Quando e onde", {"fields": ("date", "location")}),
-        ("Status", {"fields": ("status", "created_by")}),
+        ("Status e capacidade", {"fields": ("status", "capacity", "created_by")}),
         ("Datas", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
 
 
 @admin.register(EventRegistration)
 class EventRegistrationAdmin(admin.ModelAdmin):
-    list_display = ("user", "event", "registered_at")
-    list_filter = ("event",)
+    list_display = ("user", "event", "status", "registered_at")
+    list_filter = ("event", "status")
     search_fields = ("user__username", "event__title")
     readonly_fields = ("registered_at",)

@@ -74,3 +74,47 @@ class EventRegistrationModelTest(TestCase):
     def test_registration_has_registered_at(self):
         reg = EventRegistration.objects.create(user=self.user, event=self.event)
         self.assertIsNotNone(reg.registered_at)
+
+    def test_registration_default_status_is_confirmed(self):
+        reg = EventRegistration.objects.create(user=self.user, event=self.event)
+        self.assertEqual(reg.status, "confirmed")
+
+    def test_registration_can_be_waitlisted(self):
+        reg = EventRegistration.objects.create(
+            user=self.user, event=self.event, status="waitlisted"
+        )
+        self.assertEqual(reg.status, "waitlisted")
+
+    def test_registration_can_be_cancelled(self):
+        reg = EventRegistration.objects.create(
+            user=self.user, event=self.event, status="cancelled"
+        )
+        self.assertEqual(reg.status, "cancelled")
+
+
+class EventCapacityTest(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser(
+            username="admin3", email="admin3@test.com", password="admin123"
+        )
+
+    def test_event_capacity_optional(self):
+        event = Event.objects.create(
+            title="Sem limite",
+            description="desc",
+            date=timezone.now() + timezone.timedelta(days=1),
+            location="Local",
+            created_by=self.admin,
+        )
+        self.assertIsNone(event.capacity)
+
+    def test_event_capacity_can_be_set(self):
+        event = Event.objects.create(
+            title="Com limite",
+            description="desc",
+            date=timezone.now() + timezone.timedelta(days=1),
+            location="Local",
+            capacity=50,
+            created_by=self.admin,
+        )
+        self.assertEqual(event.capacity, 50)

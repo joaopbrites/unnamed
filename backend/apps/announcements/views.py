@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from apps.analytics.mixins import RecordPageViewMixin
 from .models import Announcement
 from .serializers import AnnouncementSerializer
 
@@ -10,7 +11,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return bool(request.user and request.user.is_staff)
 
 
-class AnnouncementViewSet(viewsets.ModelViewSet):
+class AnnouncementViewSet(RecordPageViewMixin, viewsets.ModelViewSet):
     queryset = Announcement.objects.all()
     serializer_class = AnnouncementSerializer
     permission_classes = [IsAdminOrReadOnly]

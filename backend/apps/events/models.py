@@ -17,6 +17,9 @@ class Event(models.Model):
     image = models.ImageField(
         upload_to="events/", blank=True, null=True, verbose_name="imagem"
     )
+    capacity = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name="capacidade máxima"
+    )
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="upcoming", verbose_name="status"
     )
@@ -40,6 +43,12 @@ class Event(models.Model):
 
 
 class EventRegistration(models.Model):
+    STATUS_CHOICES = [
+        ("confirmed", "Confirmado"),
+        ("waitlisted", "Lista de espera"),
+        ("cancelled", "Cancelado"),
+    ]
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -52,6 +61,9 @@ class EventRegistration(models.Model):
         related_name="registrations",
         verbose_name="evento",
     )
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default="confirmed", verbose_name="status"
+    )
     registered_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -60,4 +72,4 @@ class EventRegistration(models.Model):
         unique_together = [["user", "event"]]
 
     def __str__(self):
-        return f"{self.user} → {self.event}"
+        return f"{self.user} → {self.event} ({self.get_status_display()})"

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
-from .models import Comment
+from .models import Comment, CommentReaction
 
 
 class ContentTypeField(serializers.Field):
@@ -22,13 +22,42 @@ class ContentTypeField(serializers.Field):
 class CommentSerializer(serializers.ModelSerializer):
     content_type = ContentTypeField()
     author_username = serializers.ReadOnlyField(source="author.username")
+    replies_count = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    user_reaction = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = [
             "id", "author", "author_username",
             "content_type", "object_id",
-            "text", "created_at",
+            "parent",
+            "text", "is_reported",
+            "replies_count", "likes_count", "dislikes_count", "user_reaction",
+            "created_at",
         ]
-        read_only_fields = ["author", "author_username", "created_at"]
+        read_only_fields = ["author", "author_username", "is_reported", "created_at"]
 
+    def get_replies_count(self, obj):
+        return obj.replies.count()
+
+    def get_likes_count(self, obj):
+        return obj.reactions.filter(reaction_type="like").count()
+
+    def get_dislikes_count(self, obj):
+        return obj.reactions.filter(reaction_type="dislike").count()
+
+    def get_user_reaction(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            reaction = obj.reactions.filter(author=request.user).first()
+            return reaction.reaction_type if reaction else None
+        return None
+
+
+class CommentReactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentReaction
+        fields = ["id", "author", "comment", "reaction_type"]
+        read_only_fields = ["author", "comment"]

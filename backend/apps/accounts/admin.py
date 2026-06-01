@@ -11,6 +11,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ("-date_joined",)
     fieldsets = BaseUserAdmin.fieldsets + (
         ("Dados do Membro", {"fields": ("is_member", "bio", "phone")}),
+        ("Autenticação 2FA", {"fields": ("totp_enabled", "totp_secret"), "classes": ("collapse",)}),
     )
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
         ("Dados do Membro", {"fields": ("is_member", "bio", "phone")}),

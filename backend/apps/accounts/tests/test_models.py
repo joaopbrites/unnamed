@@ -40,3 +40,20 @@ class UserModelTest(TestCase):
     def test_phone_optional(self):
         user = User.objects.create_user(username="sem_fone", password="senha123")
         self.assertEqual(user.phone, "")
+
+    def test_totp_disabled_by_default(self):
+        user = User.objects.create_user(username="totp_user", password="senha123")
+        self.assertFalse(user.totp_enabled)
+
+    def test_totp_secret_blank_by_default(self):
+        user = User.objects.create_user(username="totp_user2", password="senha123")
+        self.assertEqual(user.totp_secret, "")
+
+    def test_totp_can_be_enabled(self):
+        user = User.objects.create_user(username="totp_user3", password="senha123")
+        user.totp_secret = "BASE32SECRET"
+        user.totp_enabled = True
+        user.save()
+        user.refresh_from_db()
+        self.assertTrue(user.totp_enabled)
+        self.assertEqual(user.totp_secret, "BASE32SECRET")
