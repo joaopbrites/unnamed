@@ -50,3 +50,9 @@ frontend/.env.*
 # OS
 .DS_Store
 Thumbs.db
+
+# Arquivos locais de desenvolvimento
+CLAUDE.md
+WORKFLOW.md
+dev_notes.md
+.claude/
