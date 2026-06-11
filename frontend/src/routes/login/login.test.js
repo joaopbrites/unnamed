@@ -99,6 +99,37 @@ describe('LoginPage', () => {
     render(LoginPage);
     expect(screen.getByRole('link', { name: 'Cadastre-se' })).toHaveAttribute('href', '/register');
   });
+
+  it('exibe erro e libera o botão quando authStore.login lança exceção (servidor fora)', async () => {
+    authStore.login.mockRejectedValue(new Error('Failed to fetch'));
+    const user = userEvent.setup();
+    render(LoginPage);
+
+    await user.type(screen.getByLabelText('Usuário'), 'joao');
+    await user.type(screen.getByLabelText('Senha'), 'senha123');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      // botão deve voltar a "Entrar" (loading = false)
+      expect(screen.getByRole('button', { name: 'Entrar' })).not.toBeDisabled();
+    });
+  });
+
+  it('exibe erro de conexão quando api retorna ok:false por falha de rede', async () => {
+    authStore.login.mockResolvedValue({ ok: false, data: { detail: 'Não foi possível conectar ao servidor. Tente novamente.' } });
+    const user = userEvent.setup();
+    render(LoginPage);
+
+    await user.type(screen.getByLabelText('Usuário'), 'joao');
+    await user.type(screen.getByLabelText('Senha'), 'senha123');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Não foi possível conectar ao servidor. Tente novamente.')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Entrar' })).not.toBeDisabled();
+    });
+  });
 });
 
 describe('LoginPage — Verificação TOTP', () => {

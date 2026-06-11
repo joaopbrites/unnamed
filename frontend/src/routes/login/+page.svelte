@@ -16,20 +16,24 @@
     loading = true;
     error = '';
 
-    const result = await authStore.login(username.trim(), password);
-    loading = false;
+    try {
+      const result = await authStore.login(username.trim(), password);
 
-    if (!result.ok) {
-      error = result.data?.detail ?? 'Usuário ou senha inválidos.';
-      return;
-    }
+      if (!result.ok) {
+        error = result.data?.detail ?? 'Usuário ou senha inválidos.';
+        return;
+      }
 
-    // Verificar se o usuário tem 2FA ativo
-    const { ok, data } = await api.me();
-    if (ok && data?.totp_enabled) {
-      needsTotp = true;
-    } else {
-      goto(base + '/');
+      const { ok, data } = await api.me();
+      if (ok && data?.totp_enabled) {
+        needsTotp = true;
+      } else {
+        goto(base + '/');
+      }
+    } catch {
+      error = 'Erro inesperado. Tente novamente.';
+    } finally {
+      loading = false;
     }
   }
 

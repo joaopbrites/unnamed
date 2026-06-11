@@ -8,22 +8,25 @@ function getRefresh() {
   return typeof localStorage !== 'undefined' ? localStorage.getItem('refresh_token') : null;
 }
 
+const NETWORK_ERR = { detail: 'Não foi possível conectar ao servidor. Tente novamente.' };
+
 async function refreshAccessToken() {
   const refresh = getRefresh();
   if (!refresh) return false;
-
-  const res = await fetch(`${BASE}/token/refresh/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh }),
-  });
-
-  if (res.ok) {
-    const data = await res.json();
-    localStorage.setItem('access_token', data.access);
-    return true;
+  try {
+    const res = await fetch(`${BASE}/token/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('access_token', data.access);
+      return true;
+    }
+  } catch {
+    // rede indisponível — mantém sessão como está
   }
-
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
   return false;
@@ -34,13 +37,22 @@ async function request(path, options = {}) {
   const access = getAccess();
   if (access) headers['Authorization'] = `Bearer ${access}`;
 
-  let res = await fetch(`${BASE}${path}`, { ...options, headers });
+  let res;
+  try {
+    res = await fetch(`${BASE}${path}`, { ...options, headers });
+  } catch {
+    return { ok: false, status: 0, json: async () => NETWORK_ERR };
+  }
 
   if (res.status === 401 && getRefresh()) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
       headers['Authorization'] = `Bearer ${getAccess()}`;
-      res = await fetch(`${BASE}${path}`, { ...options, headers });
+      try {
+        res = await fetch(`${BASE}${path}`, { ...options, headers });
+      } catch {
+        return { ok: false, status: 0, json: async () => NETWORK_ERR };
+      }
     }
   }
 
@@ -50,11 +62,16 @@ async function request(path, options = {}) {
 export const api = {
   // Auth
   async login(username, password) {
-    const res = await fetch(`${BASE}/token/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    });
+    let res;
+    try {
+      res = await fetch(`${BASE}/token/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+    } catch {
+      return { ok: false, data: NETWORK_ERR };
+    }
     if (res.ok) {
       const data = await res.json();
       localStorage.setItem('access_token', data.access);
@@ -70,11 +87,16 @@ export const api = {
   },
 
   async register(userData) {
-    const res = await fetch(`${BASE}/accounts/register/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    });
+    let res;
+    try {
+      res = await fetch(`${BASE}/accounts/register/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+    } catch {
+      return { ok: false, data: NETWORK_ERR };
+    }
     return { ok: res.ok, data: await res.json() };
   },
 
