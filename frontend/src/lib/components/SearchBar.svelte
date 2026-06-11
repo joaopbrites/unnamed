@@ -1,12 +1,13 @@
 <script>
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
 
   export let value = '';
   export let placeholder = 'Buscar eventos, projetos, anúncios...';
 
   function handleSubmit() {
     const q = value.trim();
-    if (q) goto(`/search?q=${encodeURIComponent(q)}`);
+    if (q) goto(base + `/search?q=${encodeURIComponent(q)}`);
   }
 
   function handleKeydown(e) {

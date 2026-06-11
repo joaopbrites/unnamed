@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { base } from '$app/paths';
   import { api } from '$lib/api';
   import { authStore, isAdmin } from '$lib/stores/auth';
 
@@ -50,7 +51,7 @@
 <div class="flex items-center justify-between mb-6">
   <h1 class="text-2xl font-bold text-gray-900">Eventos</h1>
   {#if admin}
-    <a href="/admin/events/new" class="btn-primary text-sm">+ Novo Evento</a>
+    <a href="{base}/admin/events/new" class="btn-primary text-sm">+ Novo Evento</a>
   {/if}
 </div>
 
@@ -79,7 +80,7 @@
 {:else}
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {#each events as ev (ev.id)}
-      <a href="/events/{ev.id}" class="card hover:shadow-md transition-shadow block">
+      <a href="{base}/events/{ev.id}" class="card hover:shadow-md transition-shadow block">
         {#if ev.image}
           <img src={ev.image} alt={ev.title} class="w-full h-36 object-cover rounded-md mb-4 -mx-0" />
         {/if}

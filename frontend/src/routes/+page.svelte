@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { base } from '$app/paths';
   import { api } from '$lib/api';
 
   let events = [];
@@ -33,8 +34,8 @@
     Associação de bairro dedicada ao esporte, cultura e comunidade.
   </p>
   <div class="mt-6 flex justify-center gap-4">
-    <a href="/events" class="btn-primary">Ver Eventos</a>
-    <a href="/projects" class="btn-secondary">Nossos Projetos</a>
+    <a href="{base}/events" class="btn-primary">Ver Eventos</a>
+    <a href="{base}/projects" class="btn-secondary">Nossos Projetos</a>
   </div>
 </section>
 
@@ -46,14 +47,14 @@
     <section>
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-gray-900">Próximos Eventos</h2>
-        <a href="/events" class="text-sm text-blue-600 hover:underline">Ver todos</a>
+        <a href="{base}/events" class="text-sm text-blue-600 hover:underline">Ver todos</a>
       </div>
       {#if events.length === 0}
         <p class="text-gray-500 text-sm">Nenhum evento próximo.</p>
       {:else}
         <div class="space-y-3">
           {#each events as ev (ev.id)}
-            <a href="/events/{ev.id}" class="card block hover:shadow-md transition-shadow">
+            <a href="{base}/events/{ev.id}" class="card block hover:shadow-md transition-shadow">
               <h3 class="font-medium text-gray-900">{ev.title}</h3>
               <p class="text-sm text-gray-500 mt-1">
                 {new Date(ev.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
@@ -69,14 +70,14 @@
     <section>
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-gray-900">Anúncios</h2>
-        <a href="/announcements" class="text-sm text-blue-600 hover:underline">Ver todos</a>
+        <a href="{base}/announcements" class="text-sm text-blue-600 hover:underline">Ver todos</a>
       </div>
       {#if announcements.length === 0}
         <p class="text-gray-500 text-sm">Nenhum anúncio.</p>
       {:else}
         <div class="space-y-3">
           {#each announcements as ann (ann.id)}
-            <a href="/announcements/{ann.id}" class="card block hover:shadow-md transition-shadow">
+            <a href="{base}/announcements/{ann.id}" class="card block hover:shadow-md transition-shadow">
               {#if ann.is_pinned}
                 <span class="badge-blue mb-1">📌 Fixado</span>
               {/if}

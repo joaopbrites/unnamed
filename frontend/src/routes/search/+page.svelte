@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { api } from '$lib/api';
 
   let query = '';
@@ -35,7 +36,7 @@
 
   function submit() {
     if (!query.trim()) return;
-    goto(`/search?q=${encodeURIComponent(query.trim())}`);
+    goto(base + `/search?q=${encodeURIComponent(query.trim())}`);
     doSearch();
   }
 
@@ -74,7 +75,7 @@
         </h2>
         <div class="space-y-3">
           {#each results.events as ev (ev.id)}
-            <a href="/events/{ev.id}" class="card block hover:shadow-md transition-shadow">
+            <a href="{base}/events/{ev.id}" class="card block hover:shadow-md transition-shadow">
               <h3 class="font-medium text-gray-900">{ev.title}</h3>
               <p class="text-sm text-gray-500 mt-1">{ev.location} — {new Date(ev.date).toLocaleDateString('pt-BR')}</p>
             </a>
@@ -91,7 +92,7 @@
         </h2>
         <div class="space-y-3">
           {#each results.projects as proj (proj.id)}
-            <a href="/projects/{proj.id}" class="card block hover:shadow-md transition-shadow">
+            <a href="{base}/projects/{proj.id}" class="card block hover:shadow-md transition-shadow">
               <h3 class="font-medium text-gray-900">{proj.title}</h3>
               <p class="text-sm text-gray-500 mt-1 line-clamp-2">{proj.description}</p>
             </a>
@@ -108,7 +109,7 @@
         </h2>
         <div class="space-y-3">
           {#each results.announcements as ann (ann.id)}
-            <a href="/announcements/{ann.id}" class="card block hover:shadow-md transition-shadow">
+            <a href="{base}/announcements/{ann.id}" class="card block hover:shadow-md transition-shadow">
               <h3 class="font-medium text-gray-900">{ann.title}</h3>
               <p class="text-sm text-gray-500 mt-1 line-clamp-2">{ann.content}</p>
             </a>

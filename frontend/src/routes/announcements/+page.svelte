@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { base } from '$app/paths';
   import { api } from '$lib/api';
   import { isAdmin } from '$lib/stores/auth';
 
@@ -42,7 +43,7 @@
 <div class="flex items-center justify-between mb-6">
   <h1 class="text-2xl font-bold text-gray-900">Anúncios</h1>
   {#if admin}
-    <a href="/admin/announcements/new" class="btn-primary text-sm">+ Novo Anúncio</a>
+    <a href="{base}/admin/announcements/new" class="btn-primary text-sm">+ Novo Anúncio</a>
   {/if}
 </div>
 
@@ -54,7 +55,7 @@
   <div class="space-y-4">
     {#each announcements as ann (ann.id)}
       <a
-        href="/announcements/{ann.id}"
+        href="{base}/announcements/{ann.id}"
         class="card block hover:shadow-md transition-shadow {ann.is_pinned ? 'border-l-4 border-blue-400' : ''}"
       >
         <div class="flex items-start justify-between gap-3">

@@ -1,5 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { authStore } from '$lib/stores/auth';
   import { api } from '$lib/api';
 
@@ -28,7 +29,7 @@
     if (ok && data?.totp_enabled) {
       needsTotp = true;
     } else {
-      goto('/');
+      goto(base + '/');
     }
   }
 
@@ -39,7 +40,7 @@
     const { ok, data } = await api.verify2FA(totpCode.trim());
     loading = false;
     if (ok && data.verified) {
-      goto('/');
+      goto(base + '/');
     } else {
       error = data?.detail ?? 'Código inválido.';
     }
@@ -91,7 +92,7 @@
         </form>
         <p class="text-sm text-center text-gray-500 mt-4">
           Não tem conta?
-          <a href="/register" class="text-blue-600 hover:underline">Cadastre-se</a>
+          <a href="{base}/register" class="text-blue-600 hover:underline">Cadastre-se</a>
         </p>
       {:else}
         <form on:submit|preventDefault={handleTotp} class="space-y-4">

@@ -1,5 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { api } from '$lib/api';
 
   let form = { username: '', email: '', password: '', first_name: '', last_name: '' };
@@ -14,7 +15,7 @@
     loading = false;
     if (ok) {
       success = true;
-      setTimeout(() => goto('/login'), 2000);
+      setTimeout(() => goto(base + '/login'), 2000);
     } else {
       errors = data ?? {};
     }
@@ -93,7 +94,7 @@
 
         <p class="text-sm text-center text-gray-500 mt-4">
           Já tem conta?
-          <a href="/login" class="text-blue-600 hover:underline">Entrar</a>
+          <a href="{base}/login" class="text-blue-600 hover:underline">Entrar</a>
         </p>
       {/if}
     </div>

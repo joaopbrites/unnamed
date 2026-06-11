@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { api } from '$lib/api';
   import { isAdmin } from '$lib/stores/auth';
   import CommentSection from '$lib/components/CommentSection.svelte';
@@ -23,7 +24,7 @@
 
   async function deleteProject() {
     const { ok } = await api.deleteProject(id);
-    if (ok) goto('/projects');
+    if (ok) goto(base + '/projects');
   }
 
   const STATUS_LABELS = {
@@ -45,10 +46,10 @@
 </svelte:head>
 
 <div class="flex items-center justify-between mb-4">
-  <a href="/projects" class="text-sm text-blue-600 hover:underline">← Voltar para projetos</a>
+  <a href="{base}/projects" class="text-sm text-blue-600 hover:underline">← Voltar para projetos</a>
   {#if admin}
     <div class="flex gap-2">
-      <a href="/admin/projects/{id}/edit" class="btn-secondary text-sm py-1.5">Editar</a>
+      <a href="{base}/admin/projects/{id}/edit" class="btn-secondary text-sm py-1.5">Editar</a>
       {#if !deleteConfirm}
         <button on:click={() => (deleteConfirm = true)} class="btn-danger text-sm py-1.5">Excluir</button>
       {:else}
