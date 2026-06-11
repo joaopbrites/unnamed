@@ -13,6 +13,7 @@ export default defineConfig({
       '$app/environment': r('./src/__mocks__/app-environment.js'),
       '$app/navigation': r('./src/__mocks__/app-navigation.js'),
       '$app/stores': r('./src/__mocks__/app-stores.js'),
+      '$app/paths': r('./src/__mocks__/app-paths.js'),
     },
   },
   test: {
