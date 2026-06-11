@@ -25,8 +25,15 @@ class UserPublicSerializer(serializers.ModelSerializer):
 class UserMeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "email", "first_name", "last_name", "bio", "is_member", "is_staff")
+        fields = ("id", "username", "email", "first_name", "last_name", "bio", "is_member", "is_staff", "is_superuser")
         read_only_fields = fields
+
+
+class UserAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "first_name", "last_name", "is_member", "is_staff", "is_superuser", "date_joined")
+        read_only_fields = ("id", "username", "email", "first_name", "last_name", "date_joined")
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

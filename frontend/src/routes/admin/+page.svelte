@@ -1,13 +1,16 @@
 <script>
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { isAdmin } from '$lib/stores/auth';
+  import { base } from '$app/paths';
+  import { isAdmin, isSuperuser } from '$lib/stores/auth';
 
   let admin = false;
+  let superuser = false;
   isAdmin.subscribe((v) => (admin = v));
+  isSuperuser.subscribe((v) => (superuser = v));
 
   onMount(() => {
-    if (!admin) goto('/');
+    if (!admin) goto(`${base}/`);
   });
 </script>
 
@@ -50,5 +53,13 @@
       <p class="text-sm text-gray-500 mb-4">Visualizações de página e estatísticas.</p>
       <a href="/analytics" class="btn-secondary text-sm text-center block">Ver Analytics</a>
     </div>
+
+    {#if superuser}
+      <div class="card border-yellow-200 bg-yellow-50">
+        <h2 class="text-lg font-semibold text-gray-900 mb-1">Usuários</h2>
+        <p class="text-sm text-gray-500 mb-4">Gerencie permissões de membro, admin e superusuário.</p>
+        <a href="{base}/admin/users" class="btn-primary text-sm text-center block">Gerenciar Usuários</a>
+      </div>
+    {/if}
   </div>
 {/if}

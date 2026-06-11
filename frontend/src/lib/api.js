@@ -238,6 +238,20 @@ export const api = {
     return { ok: res.ok, data: await res.json() };
   },
 
+  // User management (superuser only)
+  async getUsers() {
+    const res = await request('/accounts/users/');
+    return { ok: res.ok, data: await res.json() };
+  },
+
+  async updateUserRole(id, data) {
+    const res = await request(`/accounts/users/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return { ok: res.ok, data: await res.json() };
+  },
+
   // Search
   async search(query) {
     const res = await request(`/search/?q=${encodeURIComponent(query)}`);

@@ -1,12 +1,37 @@
 import pyotp
 from rest_framework import generics, permissions, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .serializers import UserRegistrationSerializer, UserPublicSerializer, UserMeSerializer, UserProfileSerializer
+from .serializers import UserRegistrationSerializer, UserPublicSerializer, UserMeSerializer, UserProfileSerializer, UserAdminSerializer
 
 User = get_user_model()
+
+
+class IsSuperUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_superuser)
+
+
+class UserListAdminView(generics.ListAPIView):
+    queryset = User.objects.all().order_by("username")
+    serializer_class = UserAdminSerializer
+    permission_classes = [IsSuperUser]
+    pagination_class = None
+
+
+class UserRoleUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserAdminSerializer
+    permission_classes = [IsSuperUser]
+    http_method_names = ["patch"]
+
+    def perform_update(self, serializer):
+        if serializer.instance == self.request.user:
+            raise ValidationError("Não é possível alterar as próprias permissões.")
+        serializer.save()
 
 
 class RegisterView(generics.CreateAPIView):
