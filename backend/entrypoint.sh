@@ -37,6 +37,9 @@ done
 echo "Banco disponível. Executando migrations..."
 python manage.py migrate --noinput
 
+echo "Coletando arquivos estáticos..."
+python manage.py collectstatic --noinput --clear
+
 echo "Criando superusuário padrão (se necessário)..."
 python manage.py create_default_superuser
 
