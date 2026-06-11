@@ -11,7 +11,6 @@
   let events = [];
   let announcements = [];
   let projects = [];
-  let loading = true;
 
   onMount(async () => {
     const [evRes, anRes, prRes] = await Promise.all([
@@ -32,7 +31,6 @@
       const d = prRes.data;
       projects = (Array.isArray(d) ? d : (d.results ?? [])).slice(0, 3);
     }
-    loading = false;
   });
 
   function fmtDate(s) {
@@ -108,34 +106,81 @@
   </a>
 </div>
 
-<!-- Conteúdo recente -->
-{#if loading}
-  <div class="mt-10 grid md:grid-cols-3 gap-8">
-    {#each [1, 2, 3] as _}
-      <div class="space-y-3">
-        <div class="h-5 bg-gray-200 rounded animate-pulse w-40"></div>
-        {#each [1, 2, 3] as __}
-          <div class="card space-y-2">
-            <div class="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-            <div class="h-3 bg-gray-100 rounded animate-pulse w-1/2"></div>
-            <div class="h-3 bg-gray-100 rounded animate-pulse w-2/3"></div>
-          </div>
-        {/each}
-      </div>
-    {/each}
+<!-- Sobre a associação -->
+<section class="mt-14">
+  <div class="text-center mb-10">
+    <h2 class="text-3xl font-bold text-gray-900 mb-3">Sobre a SDSC</h2>
+    <p class="text-gray-600 max-w-2xl mx-auto leading-relaxed">
+      Fundada em 1987, a Sociedade Desportiva São Caetano nasceu da vontade dos moradores de criar um espaço de convivência,
+      esporte e desenvolvimento humano no coração do bairro. Ao longo de quase quatro décadas, tornamo-nos referência em
+      atividades esportivas, projetos sociais e integração comunitária para todas as idades.
+    </p>
   </div>
-{:else}
-  <div class="mt-10 grid md:grid-cols-3 gap-8">
+
+  <div class="grid md:grid-cols-3 gap-6">
+    <!-- Missão -->
+    <div class="card text-center">
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Nossa Missão</h3>
+      <p class="text-sm text-gray-600 leading-relaxed">
+        Promover o esporte, a cultura e o bem-estar da comunidade, oferecendo estrutura, programas e oportunidades
+        acessíveis a todos os moradores do bairro São Caetano e região.
+      </p>
+    </div>
+
+    <!-- Visão -->
+    <div class="card text-center">
+      <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Nossa Visão</h3>
+      <p class="text-sm text-gray-600 leading-relaxed">
+        Ser reconhecida como a principal associação desportiva e cultural da região, referência em inclusão social,
+        formação de atletas e fortalecimento do espírito comunitário.
+      </p>
+    </div>
+
+    <!-- Valores -->
+    <div class="card text-center">
+      <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Nossos Valores</h3>
+      <ul class="text-sm text-gray-600 space-y-1">
+        <li>Inclusão e diversidade</li>
+        <li>Respeito e fair play</li>
+        <li>Solidariedade comunitária</li>
+        <li>Saúde e qualidade de vida</li>
+        <li>Transparência na gestão</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Conteúdo recente (aparece quando a API responde) -->
+{#if events.length > 0 || projects.length > 0 || announcements.length > 0}
+  <div class="mt-14 grid md:grid-cols-3 gap-8">
 
     <!-- Próximos Eventos -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">Próximos Eventos</h2>
-        <a href="{base}/events" class="text-sm text-blue-600 hover:underline">Ver todos →</a>
-      </div>
-      {#if events.length === 0}
-        <p class="text-gray-500 text-sm">Nenhum evento próximo.</p>
-      {:else}
+    {#if events.length > 0}
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Próximos Eventos</h2>
+          <a href="{base}/events" class="text-sm text-blue-600 hover:underline">Ver todos →</a>
+        </div>
         <div class="space-y-3">
           {#each events as ev (ev.id)}
             <a href="{base}/events/{ev.id}" class="card block hover:shadow-md transition-shadow group">
@@ -148,18 +193,16 @@
             </a>
           {/each}
         </div>
-      {/if}
-    </section>
+      </section>
+    {/if}
 
     <!-- Projetos Recentes -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">Projetos Recentes</h2>
-        <a href="{base}/projects" class="text-sm text-blue-600 hover:underline">Ver todos →</a>
-      </div>
-      {#if projects.length === 0}
-        <p class="text-gray-500 text-sm">Nenhum projeto cadastrado.</p>
-      {:else}
+    {#if projects.length > 0}
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Projetos Recentes</h2>
+          <a href="{base}/projects" class="text-sm text-blue-600 hover:underline">Ver todos →</a>
+        </div>
         <div class="space-y-3">
           {#each projects as pr (pr.id)}
             <a href="{base}/projects/{pr.id}" class="card block hover:shadow-md transition-shadow group">
@@ -174,18 +217,16 @@
             </a>
           {/each}
         </div>
-      {/if}
-    </section>
+      </section>
+    {/if}
 
     <!-- Anúncios -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">Anúncios</h2>
-        <a href="{base}/announcements" class="text-sm text-blue-600 hover:underline">Ver todos →</a>
-      </div>
-      {#if announcements.length === 0}
-        <p class="text-gray-500 text-sm">Nenhum anúncio.</p>
-      {:else}
+    {#if announcements.length > 0}
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Anúncios</h2>
+          <a href="{base}/announcements" class="text-sm text-blue-600 hover:underline">Ver todos →</a>
+        </div>
         <div class="space-y-3">
           {#each announcements as ann (ann.id)}
             <a href="{base}/announcements/{ann.id}" class="card block hover:shadow-md transition-shadow group">
@@ -197,8 +238,8 @@
             </a>
           {/each}
         </div>
-      {/if}
-    </section>
+      </section>
+    {/if}
 
   </div>
 {/if}

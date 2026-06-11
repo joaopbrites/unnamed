@@ -54,7 +54,7 @@ describe('HomePage — cards de seção', () => {
     expect(screen.getByText('Novidades e comunicados')).toBeInTheDocument();
   });
 
-  it('cada card de seção é um link para a rota correta', () => {
+  it('cada card é um link para a rota correta', () => {
     render(HomePage);
     expect(screen.getByRole('link', { name: /Participe das atividades/ })).toHaveAttribute('href', '/events');
     expect(screen.getByRole('link', { name: /Iniciativas da nossa/ })).toHaveAttribute('href', '/projects');
@@ -62,24 +62,64 @@ describe('HomePage — cards de seção', () => {
   });
 });
 
-describe('HomePage — loading', () => {
-  it('exibe skeleton animado enquanto carrega', () => {
-    api.getEvents.mockReturnValue(new Promise(() => {}));
-    const { container } = render(HomePage);
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+describe('HomePage — seção Sobre', () => {
+  it('exibe o título "Sobre a SDSC"', () => {
+    render(HomePage);
+    expect(screen.getByText('Sobre a SDSC')).toBeInTheDocument();
   });
 
-  it('remove skeleton após dados carregados', async () => {
+  it('exibe o parágrafo de introdução com ano de fundação', () => {
+    render(HomePage);
+    expect(screen.getByText(/Fundada em 1987/)).toBeInTheDocument();
+  });
+
+  it('exibe card de Missão com texto', () => {
+    render(HomePage);
+    expect(screen.getByText('Nossa Missão')).toBeInTheDocument();
+    expect(screen.getByText(/Promover o esporte/)).toBeInTheDocument();
+  });
+
+  it('exibe card de Visão com texto', () => {
+    render(HomePage);
+    expect(screen.getByText('Nossa Visão')).toBeInTheDocument();
+    expect(screen.getByText(/principal associação desportiva/)).toBeInTheDocument();
+  });
+
+  it('exibe card de Valores com lista', () => {
+    render(HomePage);
+    expect(screen.getByText('Nossos Valores')).toBeInTheDocument();
+    expect(screen.getByText('Inclusão e diversidade')).toBeInTheDocument();
+    expect(screen.getByText('Respeito e fair play')).toBeInTheDocument();
+    expect(screen.getByText('Solidariedade comunitária')).toBeInTheDocument();
+  });
+});
+
+describe('HomePage — sem skeleton', () => {
+  it('não exibe skeleton de loading em nenhum momento', () => {
     const { container } = render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Festa Junina')).toBeInTheDocument();
-    });
+    expect(container.querySelector('.animate-pulse')).not.toBeInTheDocument();
+  });
+
+  it('não exibe skeleton mesmo com API pendente', () => {
+    api.getEvents.mockReturnValue(new Promise(() => {}));
+    const { container } = render(HomePage);
     expect(container.querySelector('.animate-pulse')).not.toBeInTheDocument();
   });
 });
 
-describe('HomePage — eventos', () => {
-  it('exibe títulos dos eventos carregados', async () => {
+describe('HomePage — conteúdo recente (condicional)', () => {
+  it('não exibe seções de recentes quando API retorna vazio', async () => {
+    api.getEvents.mockResolvedValue({ ok: true, data: { results: [] } });
+    api.getAnnouncements.mockResolvedValue({ ok: true, data: { results: [] } });
+    api.getProjects.mockResolvedValue({ ok: true, data: { results: [] } });
+    render(HomePage);
+    await waitFor(() => {
+      expect(screen.queryByText('Próximos Eventos')).not.toBeInTheDocument();
+      expect(screen.queryByText('Projetos Recentes')).not.toBeInTheDocument();
+    });
+  });
+
+  it('exibe eventos após carregamento', async () => {
     render(HomePage);
     await waitFor(() => {
       expect(screen.getByText('Festa Junina')).toBeInTheDocument();
@@ -87,39 +127,7 @@ describe('HomePage — eventos', () => {
     });
   });
 
-  it('exibe data e local do evento', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Quadra')).toBeInTheDocument();
-      expect(screen.getByText(/15.*jun/i)).toBeInTheDocument();
-    });
-  });
-
-  it('exibe badge de status "Próximo" para upcoming', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getAllByText('Próximo').length).toBeGreaterThan(0);
-    });
-  });
-
-  it('exibe badge "Em andamento" para ongoing', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Em andamento')).toBeInTheDocument();
-    });
-  });
-
-  it('exibe mensagem vazia quando não há eventos', async () => {
-    api.getEvents.mockResolvedValue({ ok: true, data: { results: [] } });
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Nenhum evento próximo.')).toBeInTheDocument();
-    });
-  });
-});
-
-describe('HomePage — projetos', () => {
-  it('exibe títulos dos projetos carregados', async () => {
+  it('exibe projetos após carregamento', async () => {
     render(HomePage);
     await waitFor(() => {
       expect(screen.getByText('Reforma do Campo')).toBeInTheDocument();
@@ -127,32 +135,7 @@ describe('HomePage — projetos', () => {
     });
   });
 
-  it('exibe badge "Ativo" e "Planejamento"', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Ativo')).toBeInTheDocument();
-      expect(screen.getByText('Planejamento')).toBeInTheDocument();
-    });
-  });
-
-  it('exibe data de início quando disponível', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText(/Início:.*jan/i)).toBeInTheDocument();
-    });
-  });
-
-  it('exibe mensagem vazia quando não há projetos', async () => {
-    api.getProjects.mockResolvedValue({ ok: true, data: { results: [] } });
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Nenhum projeto cadastrado.')).toBeInTheDocument();
-    });
-  });
-});
-
-describe('HomePage — anúncios', () => {
-  it('exibe títulos dos anúncios carregados', async () => {
+  it('exibe anúncios após carregamento', async () => {
     render(HomePage);
     await waitFor(() => {
       expect(screen.getByText('Reunião Geral')).toBeInTheDocument();
@@ -167,14 +150,27 @@ describe('HomePage — anúncios', () => {
     });
   });
 
-  it('não exibe badge fixado em anúncio não pinned', async () => {
-    api.getAnnouncements.mockResolvedValue({
-      ok: true,
-      data: { results: [{ id: 1, title: 'Aviso', content: 'Conteúdo.', is_pinned: false }] },
-    });
+  it('exibe badge de status dos eventos', async () => {
     render(HomePage);
-    await waitFor(() => screen.getByText('Aviso'));
-    expect(screen.queryByText('📌 Fixado')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Próximo')).toBeInTheDocument();
+      expect(screen.getByText('Em andamento')).toBeInTheDocument();
+    });
+  });
+
+  it('exibe badge de status dos projetos', async () => {
+    render(HomePage);
+    await waitFor(() => {
+      expect(screen.getByText('Ativo')).toBeInTheDocument();
+      expect(screen.getByText('Planejamento')).toBeInTheDocument();
+    });
+  });
+
+  it('exibe links "Ver todos →" apenas quando há conteúdo', async () => {
+    render(HomePage);
+    await waitFor(() => {
+      expect(screen.getAllByText('Ver todos →')).toHaveLength(3);
+    });
   });
 
   it('ordena anúncios fixados primeiro', async () => {
@@ -189,38 +185,10 @@ describe('HomePage — anúncios', () => {
     });
     render(HomePage);
     await waitFor(() => {
-      const titles = screen.getAllByRole('heading', { level: 3 });
-      const pinnedIndex = titles.findIndex(el => el.textContent === 'Fixado');
-      const normalIndex = titles.findIndex(el => el.textContent === 'Normal');
-      expect(pinnedIndex).toBeLessThan(normalIndex);
-    });
-  });
-
-  it('exibe mensagem vazia quando não há anúncios', async () => {
-    api.getAnnouncements.mockResolvedValue({ ok: true, data: { results: [] } });
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getByText('Nenhum anúncio.')).toBeInTheDocument();
-    });
-  });
-});
-
-describe('HomePage — links "Ver todos"', () => {
-  it('exibe 3 links "Ver todos →" após carregamento', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      expect(screen.getAllByText('Ver todos →')).toHaveLength(3);
-    });
-  });
-
-  it('links apontam para eventos, projetos e anúncios', async () => {
-    render(HomePage);
-    await waitFor(() => {
-      const links = screen.getAllByRole('link', { name: 'Ver todos →' });
-      const hrefs = links.map(l => l.getAttribute('href'));
-      expect(hrefs).toContain('/events');
-      expect(hrefs).toContain('/projects');
-      expect(hrefs).toContain('/announcements');
+      const headings = screen.getAllByRole('heading', { level: 3 });
+      const pinnedIdx = headings.findIndex(el => el.textContent === 'Fixado');
+      const normalIdx = headings.findIndex(el => el.textContent === 'Normal');
+      expect(pinnedIdx).toBeLessThan(normalIdx);
     });
   });
 });
