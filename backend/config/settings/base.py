@@ -113,5 +113,18 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
-    default=["http://localhost:5173", "http://127.0.0.1:5173"],
+    default=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://joaopbrites.github.io",
+    ],
 )
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
