@@ -1,5 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { api } from './api';
+import { api, normalizeApiBase } from './api';
+
+describe('normalizeApiBase', () => {
+  it('acrescenta /api quando a URL não tem o sufixo', () => {
+    expect(normalizeApiBase('https://unnamed-rzrx.onrender.com')).toBe(
+      'https://unnamed-rzrx.onrender.com/api',
+    );
+  });
+
+  it('mantém a URL que já termina em /api', () => {
+    expect(normalizeApiBase('https://unnamed-rzrx.onrender.com/api')).toBe(
+      'https://unnamed-rzrx.onrender.com/api',
+    );
+  });
+
+  it('remove barra final e não duplica /api', () => {
+    expect(normalizeApiBase('https://unnamed-rzrx.onrender.com/api/')).toBe(
+      'https://unnamed-rzrx.onrender.com/api',
+    );
+    expect(normalizeApiBase('http://localhost:8000/')).toBe('http://localhost:8000/api');
+  });
+});
 
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);

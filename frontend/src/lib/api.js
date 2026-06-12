@@ -1,4 +1,13 @@
-const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api';
+// Normaliza a base da API: tolera VITE_API_URL com ou sem o sufixo `/api`
+// (e com barra final). Sem isso, uma variável mal configurada como
+// "https://host.onrender.com" faria o app chamar ".../token/" em vez de
+// ".../api/token/", quebrando login e cadastro em produção.
+export function normalizeApiBase(raw) {
+  const trimmed = String(raw ?? '').replace(/\/+$/, '');
+  return /\/api$/.test(trimmed) ? trimmed : `${trimmed}/api`;
+}
+
+export const BASE = normalizeApiBase(import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api');
 
 function getAccess() {
   return typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null;

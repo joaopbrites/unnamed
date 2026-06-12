@@ -1,8 +1,10 @@
 <script>
   import { base } from '$app/paths';
   import { runDiagnostics, summarize } from '$lib/diagnostics';
+  import { BASE } from '$lib/api';
 
-  let apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api';
+  // Mesma base normalizada que o app de verdade usa (reflete a config real).
+  let apiBase = BASE;
   let adminUsername = '';
   let adminPassword = '';
 
