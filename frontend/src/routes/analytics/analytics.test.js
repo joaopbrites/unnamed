@@ -26,6 +26,7 @@ vi.mock('chart.js/auto', () => ({
 
 import AnalyticsPage from './+page.svelte';
 import { api } from '$lib/api';
+import Chart from 'chart.js/auto';
 
 const fakeSummary = {
   total_pageviews: 450,
@@ -102,6 +103,19 @@ describe('AnalyticsPage', () => {
     render(AnalyticsPage);
     await waitFor(() => {
       expect(api.getAnalyticsSummary).toHaveBeenCalled();
+    });
+  });
+
+  it('desenha o gráfico de linha depois que os dados carregam', async () => {
+    Chart.mockClear();
+    render(AnalyticsPage);
+    // regressão: o canvas só existe após loading=false; o gráfico precisa ser
+    // criado depois disso, senão fica um espaço em branco.
+    await waitFor(() => {
+      expect(Chart).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ type: 'line' }),
+      );
     });
   });
 });

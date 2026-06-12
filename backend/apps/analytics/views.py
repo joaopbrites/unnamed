@@ -26,6 +26,7 @@ class AnalyticsSummaryView(APIView):
             "total_announcements": Announcement.objects.count(),
             "total_comments": Comment.objects.count(),
             "total_registrations": EventRegistration.objects.count(),
+            "total_pageviews": PageView.objects.count(),
             "pageviews_last_7_days": PageView.objects.filter(
                 created_at__gte=now - timezone.timedelta(days=7)
             ).count(),

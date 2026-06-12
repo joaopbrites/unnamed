@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { goto } from '$app/navigation';
   import { api } from '$lib/api';
   import { authStore, isAdmin } from '$lib/stores/auth';
@@ -29,9 +29,13 @@
     if (sumRes.ok) summary = sumRes.data;
     if (pvRes.ok) {
       pageviews = Array.isArray(pvRes.data) ? pvRes.data : (pvRes.data.results ?? []);
-      buildChart();
     }
     loading = false;
+    // O <canvas> só entra no DOM depois de loading virar false. Esperamos o
+    // DOM atualizar (tick) antes de desenhar, senão chartCanvas fica indefinido
+    // e o gráfico nunca aparece (apenas um espaço em branco).
+    await tick();
+    buildChart();
   }
 
   function buildChart() {

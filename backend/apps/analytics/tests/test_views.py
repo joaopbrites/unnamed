@@ -47,8 +47,8 @@ class AnalyticsSummaryTest(APITestCase):
         response = self.client.get("/api/analytics/summary/")
         for field in ["total_members", "total_events", "total_projects",
                       "total_announcements", "total_comments",
-                      "total_registrations", "pageviews_last_7_days",
-                      "pageviews_last_30_days"]:
+                      "total_registrations", "total_pageviews",
+                      "pageviews_last_7_days", "pageviews_last_30_days"]:
             self.assertIn(field, response.data, f"Campo ausente: {field}")
 
     def test_summary_counts_correctly(self):
@@ -71,6 +71,7 @@ class AnalyticsSummaryTest(APITestCase):
         self.client.force_authenticate(user=self.admin)
         response = self.client.get("/api/analytics/summary/")
         self.assertEqual(response.data["pageviews_last_7_days"], 2)
+        self.assertEqual(response.data["total_pageviews"], 2)
 
 
 class PageViewHistoryTest(APITestCase):
