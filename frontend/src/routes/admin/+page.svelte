@@ -54,6 +54,12 @@
       <a href="/analytics" class="btn-secondary text-sm text-center block">Ver Analytics</a>
     </div>
 
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-1">Diagnóstico</h2>
+      <p class="text-sm text-gray-500 mb-4">Testar ao vivo todas as funções do sistema em produção.</p>
+      <a href="{base}/diagnostics" class="btn-secondary text-sm text-center block">Rodar Diagnóstico</a>
+    </div>
+
     {#if superuser}
       <div class="card border-yellow-200 bg-yellow-50">
         <h2 class="text-lg font-semibold text-gray-900 mb-1">Usuários</h2>

@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/svelte';
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 vi.mock('$lib/stores/auth', () => ({
   isAdmin: { subscribe: (fn) => { fn(true); return () => {}; } },
+  isSuperuser: { subscribe: (fn) => { fn(true); return () => {}; } },
 }));
 
 import AdminPage from './+page.svelte';
@@ -37,6 +38,18 @@ describe('AdminPage', () => {
     render(AdminPage);
     expect(screen.getByRole('link', { name: 'Ver Analytics' }))
       .toHaveAttribute('href', '/analytics');
+  });
+
+  it('exibe card de Diagnóstico com link', () => {
+    render(AdminPage);
+    expect(screen.getByRole('link', { name: 'Rodar Diagnóstico' }))
+      .toHaveAttribute('href', '/diagnostics');
+  });
+
+  it('exibe card de Usuários para superusuário', () => {
+    render(AdminPage);
+    expect(screen.getByRole('link', { name: 'Gerenciar Usuários' }))
+      .toHaveAttribute('href', '/admin/users');
   });
 
   it('goto é importado para proteção de rota', () => {
